@@ -2,6 +2,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 
 export default function Login({ navigation }) {
+  
+
   return (
     <View style={styles.backgroundStyle}>
       <Text style={styles.namePage}>Snupie</Text>
@@ -20,7 +22,8 @@ export default function Login({ navigation }) {
             secureTextEntry
           />
           <TouchableOpacity
-            style={styles.buttonLogin}>
+            style={styles.buttonLogin}
+            onPress={()=> navigation.navigate('Menu')}>
             <Text style={styles.buttonText}>Log In</Text>
           </TouchableOpacity>
           <TouchableOpacity
