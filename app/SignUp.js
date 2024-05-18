@@ -1,10 +1,8 @@
+import React from 'react';
+import { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-
-import React, { useState } from 'react';
-
-
-const SignUpScreen = ({navigation}) => {
+export default function SignUp () {
   const [nombre, setNombre] = useState('');
   const [cedula, setCedula] = useState('');
   const [email, setEmail] = useState('');
@@ -81,7 +79,7 @@ const SignUpScreen = ({navigation}) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   backgroundStyle: {
