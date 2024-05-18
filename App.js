@@ -9,6 +9,7 @@ import AsignarColab from './app/AsignarColab.js'; //Pantalla de AsignarColab
 import ModificarColab from './app/ModificarColab.js'; //Pantalla de ModificarColab
 import CrearProyecto from './app/CrearProyecto.js'; //Pantalla de CrearProyecto
 import ModProyecto from './app/ModificarProyecto.js'; //Pantalla de ModProyecto
+import CrearForo from './app/CrearForo.js'; //Pantalla de CrearForo
 
 const Stack = createNativeStackNavigator();
 
@@ -22,7 +23,8 @@ export default function App() {
         <Stack.Screen name="AsignarColab" component={AsignarColab}/>
         <Stack.Screen name="ModificarColab" component={ModificarColab}/>
         <Stack.Screen name="CrearProyecto" component={CrearProyecto}/>
-        <Stack.Screen name="ModProyecto" component={ModProyecto}/> 
+        <Stack.Screen name="ModProyecto" component={ModProyecto}/>
+        <Stack.Screen name="CrearForo" component={CrearForo}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

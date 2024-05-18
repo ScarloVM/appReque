@@ -32,7 +32,7 @@ export default function Menu({ navigation }) {
     };
 
     const enviarAForos = () => {
-    // Lógica para enviar a la página de foros
+        navigation.navigate('CrearForo');
     };
 
     return (
