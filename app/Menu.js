@@ -1,8 +1,11 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 
 
-export default function Menu({ navigation }) {
+export default function Menu({route, navigation }) {
+    const email = route.params.email;
+    Alert.alert('Datos recibidos', `Email: ${email}`);
+
     const enviarAAsignarColab = () => {
         navigation.navigate('AsignarColab');
     };

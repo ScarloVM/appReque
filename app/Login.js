@@ -1,8 +1,43 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert } from 'react-native';
 
 export default function Login({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  var idUsuarioSistema;
   
+  const ImprimirDatos = () => {
+
+    var datos = {
+        correoElectronico:email,
+        contrasena:password
+    };
+
+    Alert.alert('Datos ingresados', `Email: ${datos.correoElectronico} \nContraseña: ${datos.contrasena}`)
+
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/login', { //Cambiar por la URL de la API
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        if (data['@respuesta'] === 1) {
+            var idUsuarioSistema = data['@idUsuarioR'];
+            navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
+            Alert.alert("Inicio de sesión válido")
+            
+        } else {
+            Alert.alert("Su Email o Password son incorrectos")
+        }        
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+  };
 
   return (
     <View style={styles.backgroundStyle}>
@@ -14,16 +49,20 @@ export default function Login({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
           />
           <Text style={styles.label}>Password:</Text>
           <TextInput
             style={styles.input}
             placeholder="Password"
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity
             style={styles.buttonLogin}
-            onPress={()=> navigation.navigate('Menu')}>
+            onPress={ImprimirDatos}>
             <Text style={styles.buttonText}>Log In</Text>
           </TouchableOpacity>
           <TouchableOpacity
