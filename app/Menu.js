@@ -3,8 +3,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 
 
 export default function Menu({route, navigation }) {
-    const email = route.params.email;
-    Alert.alert('Datos recibidos', `Email: ${email}`);
+    const idUsuario = 1//route.params.idUsuarioSistema;
+    Alert.alert('Datos recibidos', `idUsuario: ${idUsuario}`);
 
     const enviarAAsignarColab = () => {
         navigation.navigate('AsignarColab');

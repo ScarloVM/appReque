@@ -1,19 +1,69 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 export default function AsignarColab({ navigation }) {
     const [selectedProyecto, setSelectedProyecto] = useState('');
     const [selectedColaborador, setSelectedColaborador] = useState('');
     const [selectedEliminar, setSelectedEliminar] = useState('');
+    const [colaboradoresEliminar, setColaboradoresEliminar] = useState([]);
+
+
+    const proyectos = [ 'Proyecto 1', 'Proyecto 2', 'Proyecto 3' ];
+
+    const proyectoColaboradores = { // Colaboradores por proyecto
+    'Proyecto 1': ['Colaborador 1', 'Colaborador 2'],
+    'Proyecto 2': ['Colaborador 2', 'Colaborador 3'],
+    'Proyecto 3': ['Colaborador 1', 'Colaborador 3']
+    };
+
+    const colaboradores = [ 'Colaborador 1', 'Colaborador 2', 'Colaborador 3' ]; // Colaboradores disponibles
 
     const asignarColaborador = () => {
-    // Lógica para asignar un colaborador
+      var datos = {
+        idProyecto: selectedProyecto,
+        idUsuario: selectedColaborador
+      };
+
+      Alert.alert('Colaborador Asignado', `Proyecto: ${datos.idProyecto} \nColaborador: ${datos.idUsuario}`);
     };
 
     const eliminarColaborador = () => {
-    // Lógica para eliminar un colaborador
+      var datos = {
+        idUsuario: selectedEliminar,
+        idProyecto: selectedProyecto
+      }
+
+      Alert.alert('Colaborador Eliminado', `Colaborador: ${datos.idUsuario} \nProyecto: ${datos.idProyecto}`)
     };
+
+    const cargarProyectos = () => {
+      return proyectos.map((proyecto) => {
+          return <Picker.Item label={proyecto} value={proyecto} key={proyecto} />;
+      });
+    };
+
+    const cargarColaboradores = () => {
+      return colaboradores.map((colaborador) => {
+          return <Picker.Item label={colaborador} value={colaborador} key={colaborador} />;
+      });
+    };
+
+
+    // Actualizar colaboradores a eliminar al cambiar de proyecto
+    useEffect(() => {
+      if (selectedProyecto) {
+        setColaboradoresEliminar(proyectoColaboradores[selectedProyecto] || []); // Si no hay colaboradores, se asigna un arreglo vacío
+        setSelectedEliminar('');
+      }
+    }, [selectedProyecto]);
+
+    const cargarEliminarColab = () => {
+      return colaboradoresEliminar.map((colaborador) => {
+          return <Picker.Item label={colaborador} value={colaborador} key={colaborador} />;
+      });
+    };
+
 
 
     return (
@@ -21,39 +71,37 @@ export default function AsignarColab({ navigation }) {
             <Text style={styles.namePage}>Snupie</Text>
             <View style={styles.container}>
                 <View style={styles.item}>
-                <Text style={styles.label}>Seleccione el proyecto:</Text>
-                <Picker
-                    selectedValue={selectedProyecto}
-                    style={styles.select}
-                    onValueChange={(itemValue) => setSelectedProyecto(itemValue)}
-                >
-                    <Picker.Item label="Proyecto 1" value="proyecto1" />
-                    <Picker.Item label="Proyecto 2" value="proyecto2" />
-                    <Picker.Item label="Proyecto 3" value="proyecto3" />
-                </Picker>
+                  <Text style={styles.label}>Seleccione el proyecto:</Text>
+                  <Picker
+                      selectedValue={selectedProyecto}
+                      style={styles.select}
+                      onValueChange={(itemValue) => setSelectedProyecto(itemValue)}
+                  >
+                    {cargarProyectos()}
+                  </Picker>
                 </View>
                 <View style={styles.item}>
-                <Text style={styles.label}>Seleccione el colaborador a asignar:</Text>
-                <Picker
-                    selectedValue={selectedColaborador}
-                    style={styles.select}
-                    onValueChange={(itemValue) => setSelectedColaborador(itemValue)}
-                >
-                    {/* Opciones del Picker */}
-                </Picker>
+                  <Text style={styles.label}>Seleccione el colaborador a asignar:</Text>
+                  <Picker
+                      selectedValue={selectedColaborador}
+                      style={styles.select}
+                      onValueChange={(itemValue) => setSelectedColaborador(itemValue)}
+                  >
+                    {cargarColaboradores()}
+                  </Picker>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={asignarColaborador}>
-                <Text style={styles.buttonText}>Asignar Colaborador</Text>
+                  <Text style={styles.buttonText}>Asignar Colaborador</Text>
                 </TouchableOpacity>
                 <View style={styles.item}>
-                <Text style={styles.label}>Seleccione el colaborador a eliminar:</Text>
-                <Picker
-                    selectedValue={selectedEliminar}
-                    style={styles.select}
-                    onValueChange={(itemValue) => setSelectedEliminar(itemValue)}
-                >
-                    {/* Opciones del Picker */}
-                </Picker>
+                  <Text style={styles.label}>Seleccione el colaborador a eliminar:</Text>
+                  <Picker
+                      selectedValue={selectedEliminar}
+                      style={styles.select}
+                      onValueChange={(itemValue) => setSelectedEliminar(itemValue)}
+                  >
+                  {cargarEliminarColab()}
+                  </Picker>
                 </View>
                 <TouchableOpacity style={styles.button} onPress={eliminarColaborador}>
                 <Text style={styles.buttonText}>Eliminar Colaborador</Text>

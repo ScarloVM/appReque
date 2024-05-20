@@ -11,7 +11,31 @@ export default function SignUp () {
   const [password, setPassword] = useState('');
 
   const registrarUsuario = () => {
-    // Lógica para registrar al usuario
+    var datos = {
+      nombre:nombre,
+      cedula:cedula,
+      correoElectronico:email,
+      departamento:departamento,
+      numeroTelefono:telefono,
+      contrasena:password
+    };
+
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/register', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);// Aquí puedes hacer algo con la respuesta del servidor si es necesario
+        var idUsuarioSistema = data['@respuesta'];
+        navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
   };
 
   return (

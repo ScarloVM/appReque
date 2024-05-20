@@ -6,7 +6,7 @@ export default function Login({ navigation }) {
   const [password, setPassword] = useState('');
   var idUsuarioSistema;
   
-  const ImprimirDatos = () => {
+  const IniciarSesion = () => {
 
     var datos = {
         correoElectronico:email,
@@ -14,29 +14,29 @@ export default function Login({ navigation }) {
     };
 
     Alert.alert('Datos ingresados', `Email: ${datos.correoElectronico} \nContraseña: ${datos.contrasena}`)
-
-    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/login', { //Cambiar por la URL de la API
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datos)
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data);
-        if (data['@respuesta'] === 1) {
-            var idUsuarioSistema = data['@idUsuarioR'];
-            navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
-            Alert.alert("Inicio de sesión válido")
+    navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
+    // fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/login', { //Cambiar por la URL de la API
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(datos)
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     console.log(data);
+    //     if (data['@respuesta'] === 1) {
+    //         var idUsuarioSistema = data['@idUsuarioR'];
+    //         navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
+    //         Alert.alert("Inicio de sesión válido")
             
-        } else {
-            Alert.alert("Su Email o Password son incorrectos")
-        }        
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
+    //     } else {
+    //         Alert.alert("Su Email o Password son incorrectos")
+    //     }        
+    // })
+    // .catch(error => {
+    //     console.error('Error:', error);
+    // });
   };
 
   return (
@@ -62,7 +62,7 @@ export default function Login({ navigation }) {
           />
           <TouchableOpacity
             style={styles.buttonLogin}
-            onPress={ImprimirDatos}>
+            onPress={IniciarSesion}>
             <Text style={styles.buttonText}>Log In</Text>
           </TouchableOpacity>
           <TouchableOpacity

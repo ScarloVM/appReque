@@ -1,8 +1,62 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
 export default function CrearProyecto({ navigation }) {
-    return (
+  const [nombreProyecto, setNombreProyecto] = React.useState('');
+  const [recursosNecesarios, setRecursosNecesarios] = React.useState('');
+  const [presupuesto, setPresupuesto] = React.useState('');
+  const [selectedResponsable, setSelectedResponsable] = React.useState(''); //Cambiar a Picker
+  const [selectedColaborador, setSelectedColaborador] = React.useState(''); //Cambiar a Picker
+  const [colaboradoresProyecto, setColaboradoresProyecto] = React.useState([]);
+  const [descripcion, setDescripcion] = React.useState('');
+  const [fechaInicio, setFechaInicio] = React.useState('');
+  const [historialCambios, setHistorialCambios] = React.useState('');
+
+  const colaboradores = ['Colaborador 1', 'Colaborador 2', 'Colaborador 3', 'Colaborador 4', 'Colaborador 5'];
+  const responsables = ['Responsable 1', 'Responsable 2', 'Responsable 3'];
+
+  var colabsAProyecto = [];
+
+
+  const agregarColab = () => {
+    if (selectedColaborador && !colaboradoresProyecto.includes(selectedColaborador)) {
+      console.log(colaboradoresProyecto);
+      setColaboradoresProyecto([...colaboradoresProyecto, selectedColaborador]);
+      setSelectedColaborador('');
+    } else {
+      Alert.alert('Colaborador ya agregado o no seleccionado');
+    }
+  };
+
+  const crearProyecto = () => {
+    
+    var datos = {
+      nombre: nombreProyecto,
+      recursosNecesarios: recursosNecesarios,
+      presupuesto: presupuesto,
+      responsable: responsable,
+      descripcion: descripcion,
+      fechaInicio: fechaInicio
+    };
+
+    //Agregar Fetch para enviar datos a la API
+  }
+
+  const cargarResponsables = () => {
+    return responsables.map((responsable) => (
+      <Picker.Item label={responsable} value={responsable} key={responsable} />
+    ));
+  }
+
+  const cargarColaborador = () => {
+    colabsAProyecto.push(selectedColaborador)
+    return colaboradores.map((colaborador) => (
+      <Picker.Item label={colaborador} value={colaborador} key={colaborador} />
+    ));
+  }
+
+  return (
     <View style={styles.backgroundStyle}>
       <Text style={styles.namePage}>Snupie</Text>
       <ScrollView style={styles.container}>
@@ -24,24 +78,32 @@ export default function CrearProyecto({ navigation }) {
           keyboardType="numeric"
         />
         <Text style={styles.label}>Responsable:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Responsable"
-        />
+        <Picker
+          selectedValue={selectedResponsable}
+          style={styles.select}
+          onValueChange={(itemValue) => setSelectedResponsable(itemValue)}
+        >
+          {cargarResponsables()}
+        </Picker>
         <Text style={styles.label}>Colaboradores:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Colaboradores"
-        />
+        <Picker
+          selectedValue={selectedColaborador}
+          style={styles.select}
+          onValueChange={(itemValue) => setSelectedColaborador(itemValue)}
+        >
+          {cargarColaborador()}
+        </Picker>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => agregarColab()}>
+          onPress={agregarColab}>
           <Text>+</Text>
         </TouchableOpacity>
         <Text style={styles.label}>Colaboradores en el Proyecto:</Text>
-        <ScrollView>
+        <ScrollView style={styles.view}>
           <View>
-            {/* Renderizar lista de colaboradores */}
+            {colaboradoresProyecto.map((colaborador, index) => (
+              <Text key={index} style={styles.colaboradorItem}>{colaborador}</Text>
+            ))}
           </View>
         </ScrollView>
         <Text style={styles.label}>Descripción:</Text>
@@ -69,7 +131,7 @@ export default function CrearProyecto({ navigation }) {
         </TouchableOpacity>
       </ScrollView>
     </View>
-    );
+  );
 };
 
 const styles = StyleSheet.create({
@@ -111,6 +173,20 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         minHeight: 100,
     },
+    view: {
+        height: 200,
+        width: '100%',
+        marginBottom: 10,
+    },
+    select: {
+    width: '100%', // Ancho del Picker
+    height: 40,
+    marginBottom: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#000000',
+    },
     button: {
         backgroundColor: '#3E9994',
         borderRadius: 5,
@@ -130,4 +206,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
+    colaboradorItem: {
+        backgroundColor: '#F2F2F2',
+        width: '100%',
+        padding: 10,
+        marginBottom: 5,
+        borderRadius: 5,
+    }
 });
