@@ -12,47 +12,94 @@ export default function CrearProyecto({ navigation }) {
   const [descripcion, setDescripcion] = React.useState('');
   const [fechaInicio, setFechaInicio] = React.useState('');
   const [historialCambios, setHistorialCambios] = React.useState('');
+  const [colaboradores, setColaboradores] = React.useState([]);
+  const [ColabsAProyecto, setColabsAProyecto] = React.useState([]);
 
-  const colaboradores = ['Colaborador 1', 'Colaborador 2', 'Colaborador 3', 'Colaborador 4', 'Colaborador 5'];
-  const responsables = ['Responsable 1', 'Responsable 2', 'Responsable 3'];
+  React.useEffect(() => {
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/usersNotAsigned')
+        .then(response => response.json())
+        .then(data => {
+          var jsonData=data[0];
+          console.log(jsonData);
+          var colaboradores = jsonData.map(item => [item.idUsuario, item.nombre])
+          setColaboradores(colaboradores || []); // Si no hay colaboradores, se asigna un arreglo vacío
+        });
+  }, []);
 
-  var colabsAProyecto = [];
-
-
-  const agregarColab = () => {
-    if (selectedColaborador && !colaboradoresProyecto.includes(selectedColaborador)) {
-      console.log(colaboradoresProyecto);
-      setColaboradoresProyecto([...colaboradoresProyecto, selectedColaborador]);
-      setSelectedColaborador('');
-    } else {
-      Alert.alert('Colaborador ya agregado o no seleccionado');
-    }
-  };
+    const agregarColab = () => {
+      if (selectedColaborador && !colaboradoresProyecto.includes(selectedColaborador)) {
+        console.log(selectedColaborador);
+        setColaboradoresProyecto([...colaboradoresProyecto, selectedColaborador[1]]);
+        setColabsAProyecto([...ColabsAProyecto, selectedColaborador[0]]);
+        setSelectedColaborador('');
+      } else {
+        Alert.alert('Colaborador ya agregado o no seleccionado');
+      }
+    };
+  
 
   const crearProyecto = () => {
-    
+
     var datos = {
       nombre: nombreProyecto,
       recursosNecesarios: recursosNecesarios,
-      presupuesto: presupuesto,
-      responsable: responsable,
+      presupuesto: parseInt(presupuesto),
+      responsable: selectedResponsable,
       descripcion: descripcion,
       fechaInicio: fechaInicio
     };
 
-    //Agregar Fetch para enviar datos a la API
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/createProject', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Se ha creado el proyecto correctamente");
+        var idProyecto = data['@respuesta'];
+
+        ColabsAProyecto.forEach(function(idColab, index) {
+            var datos = {
+                idProyecto:idProyecto,
+                idUsuario:idColab
+            }
+
+            console.log(JSON.stringify(datos));
+            fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/asignProject', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);// Aquí puedes hacer algo con la respuesta del servidor si es necesario
+                setColabsAProyecto([]);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        })
+
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
   }
 
   const cargarResponsables = () => {
-    return responsables.map((responsable) => (
-      <Picker.Item label={responsable} value={responsable} key={responsable} />
+    return colaboradores.map((responsable) => (
+      <Picker.Item label={responsable[1]} value={responsable[0]} key={responsable} />
     ));
   }
 
   const cargarColaborador = () => {
-    colabsAProyecto.push(selectedColaborador)
     return colaboradores.map((colaborador) => (
-      <Picker.Item label={colaborador} value={colaborador} key={colaborador} />
+      <Picker.Item label={colaborador[1]} value={colaborador} key={colaborador} />
     ));
   }
 
@@ -64,18 +111,24 @@ export default function CrearProyecto({ navigation }) {
         <TextInput
           style={styles.input}
           placeholder="Nombre del Proyecto"
+          onChangeText={setNombreProyecto}
+          value={nombreProyecto}
         />
         <Text style={styles.label}>Recursos Necesarios:</Text>
         <TextInput
           style={styles.textArea}
           placeholder="Recursos Necesarios"
           multiline
+          onChangeText={setRecursosNecesarios}
+          value={recursosNecesarios}
         />
         <Text style={styles.label}>Presupuesto:</Text>
         <TextInput
           style={styles.input}
           placeholder="Presupuesto"
           keyboardType="numeric"
+          onChangeText={setPresupuesto}
+          value={presupuesto}
         />
         <Text style={styles.label}>Responsable:</Text>
         <Picker
@@ -111,18 +164,23 @@ export default function CrearProyecto({ navigation }) {
           style={styles.textArea}
           placeholder="Descripción"
           multiline
+          onChangeText={setDescripcion}
+          value={descripcion}
         />
         <Text style={styles.label}>Fecha de Inicio:</Text>
         <TextInput
           style={styles.input}
           placeholder="Fecha de Inicio"
-          keyboardType="numeric"
+          onChangeText={setFechaInicio}
+          value={fechaInicio}
         />
         <Text style={styles.label}>Historial de Cambios:</Text>
         <TextInput
           style={styles.textArea}
           placeholder="Historial de Cambios"
           multiline
+          onChangeText={setHistorialCambios}
+          value={historialCambios}
         />
         <TouchableOpacity
           style={styles.buttonCrear}

@@ -15,6 +15,7 @@ export default function AsignarColab({ navigation }) {
       .then(response => response.json())
       .then (data => {
         var jsonData= data[0];
+        console.log(jsonData);
         var ListaProyectos = jsonData.map(item => [item.idProyecto, item.Nombre]);
         setListaProyectos(ListaProyectos || []); // Si no hay proyectos, se asigna un arreglo vacío
       });
@@ -59,27 +60,27 @@ export default function AsignarColab({ navigation }) {
         idProyecto: selectedProyecto
       }
 
-      // fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/deleteUserProject/', {
-      //   method: 'DELETE',
-      //   headers: {
-      //       'Content-Type': 'application/json'
-      //   },
-      //   body: JSON.stringify(datos)
-          
-      // })
-      // .then(response => {
-      //   if (response.ok) {
-      //     // La solicitud de eliminación fue exitosa
-      //     Alert.alert('El colaborador fue eliminado correctamente.');
-      //   } else {
-      //       // La solicitud de eliminación falló
-      //       console.error('Error al intentar eliminar al colaborador.');
-      //   }
-      // })
-      // .catch(error => {
-      //   // Manejar errores de red u otros errores
-      //   console.error('Hubo un error en la solicitud de eliminación:', error);
-      // });
+      fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/deleteUserProject', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+     
+      })
+      .then(response => {
+        if (response.ok) {
+          // La solicitud de eliminación fue exitosa
+          Alert.alert('El colaborador fue eliminado correctamente.');
+        } else {
+            // La solicitud de eliminación falló
+            console.error('Error al intentar eliminar al colaborador.');
+        }
+      })
+      .catch(error => {
+        // Manejar errores de red u otros errores
+        console.error('Hubo un error en la solicitud de eliminación:', error);
+      });
     };
 
     const cargarProyectos = () => {
