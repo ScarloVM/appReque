@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { Picker } from "@react-native-picker/picker";
-import { useState } from "react";
 
 export default function ModificarProyecto({ navigation }) {
     const [selectedProyecto, setSelectedProyecto] = useState('');
+    const [proyectos, setProyectos] = useState([]);
+    const [tareas, setTareas] = useState([]);
+    const [colaboradores, setColaboradores] = useState([]);
     const [nombreTarea, setNombreTarea] = useState('');
     const [recursosEconomicosTarea, setRecursosEconomicosTarea] = useState('');
     const [tiempoEstimadoTarea, setTiempoEstimadoTarea] = useState('');
@@ -13,12 +15,112 @@ export default function ModificarProyecto({ navigation }) {
     const [selectedColab, setSelectedColab] = useState('');
     const [storyPointsTarea, setStoryPointsTarea] = useState('');
 
-    const cambiarDatos = () => {
-        // Lógica para cambiar datos
+    useEffect(() => {
+        fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/projects')
+            .then(response => response.json())
+            .then(data => {
+                const listaProyectos = data[0].map(item => ({ id: item.idProyecto, nombre: item.Nombre }));
+                setProyectos(listaProyectos);
+                if (listaProyectos.length > 0) {
+                    setSelectedProyecto(listaProyectos[0].id);
+                }
+            });
+    }, []);
+
+
+    useEffect(() => {
+        if (selectedProyecto) {
+            cargarUsuariosDelProyecto(selectedProyecto);
+            cargarTareas(selectedProyecto);
+        }
+    }, [selectedProyecto]);
+
+    const cargarUsuariosDelProyecto = (idProyecto) => {
+        fetch(`https://api-snupie-saap7xdoua-uc.a.run.app/api/projectWorkers/${idProyecto}`)
+            .then(response => response.json())
+            .then(data => {
+                const usuarios = data[0].map(item => ({ id: item.idUsuario, nombre: item.nombre, correo: item.correoElectronico }));
+                setColaboradores(usuarios);
+                setCorreos(usuarios.map(usuario => usuario.correo));
+            });
+    };
+
+    const cargarTareas = (idProyecto) => {
+        fetch(`https://api-snupie-saap7xdoua-uc.a.run.app/api/getProjectTasks/${idProyecto}`)
+            .then(response => response.json())
+            .then(data => {
+                setTareas(data[0]);
+                console.log(data[0]);
+            });
     };
 
     const AgregarTarea = () => {
-        // Lógica para agregar tarea
+        var datos = {
+            idProyecto: parseInt(selectedProyecto),
+            nombre: nombreTarea,
+            descripcion: descripcionTarea,
+            usuario: selectedColab,
+            storyPoints: storyPointsTarea
+        };
+        console.log(datos);
+
+        fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/createTask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        })
+            .then(response => response.json())
+            .then(data => {
+                cargarTareas(selectedProyecto);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+
+    const finalizarTarea = (idTarea, nombreTarea) => {
+        console.log(idTarea);
+        fetch(`https://api-snupie-saap7xdoua-uc.a.run.app/api/endTask/${idTarea}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        
+            .then(response => {
+                if (response.ok) {
+                    
+                    alert('La tarea fue finalizada correctamente.');
+                    cargarTareas(selectedProyecto);
+                } else {
+                    console.error('Error al intentar finalizar la tarea.');
+                }
+            })
+            .catch(error => {
+                console.error('Hubo un error en la solicitud de finalización:', error);
+            });
+    };
+
+    const eliminarTarea = (idTarea) => {
+        fetch(`https://api-snupie-saap7xdoua-uc.a.run.app/api/deleteTask/${idTarea}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('La tarea fue eliminada correctamente.');
+                    cargarTareas(selectedProyecto);
+                } else {
+                    console.error('Error al intentar eliminar la tarea.');
+                }
+            })
+            .catch(error => {
+                console.error('Hubo un error en la solicitud de eliminación:', error);
+            });
     };
 
     return (
@@ -33,7 +135,9 @@ export default function ModificarProyecto({ navigation }) {
                             style={styles.select}
                             onValueChange={(itemValue) => setSelectedProyecto(itemValue)}
                         >
-                            {/* Opciones del Picker */}
+                            {proyectos.map(proyecto => (
+                                <Picker.Item key={proyecto.id} label={proyecto.nombre} value={proyecto.id} />
+                            ))}
                         </Picker>
                     </View>
 
@@ -51,7 +155,7 @@ export default function ModificarProyecto({ navigation }) {
                             style={styles.input}
                             value={recursosEconomicosTarea}
                             onChangeText={setRecursosEconomicosTarea}
-                            placeholder="Recursos Economicos Necesarios"
+                            placeholder="Recursos Económicos Necesarios"
                         />
                         <Text style={styles.label}>Tiempo Estimado de Desarrollo:</Text>
                         <TextInput
@@ -66,7 +170,6 @@ export default function ModificarProyecto({ navigation }) {
                             style={styles.select}
                             onValueChange={(itemValue) => setEstadoTarea(itemValue)}
                         >
-                            {/* Opciones del Picker */}
                             <Picker.Item label="En Proceso" value="En Proceso" />
                             <Picker.Item label="Finalizado" value="Finalizado" />
                             <Picker.Item label="Pendiente" value="Pendiente" />
@@ -85,7 +188,9 @@ export default function ModificarProyecto({ navigation }) {
                             style={styles.select}
                             onValueChange={(itemValue) => setSelectedColab(itemValue)}
                         >
-                            {/* Opciones del Picker */}
+                            {colaboradores.map(colab => (
+                                <Picker.Item key={colab.id} label={colab.nombre} value={colab.id} />
+                            ))}
                         </Picker>
                         <Text style={styles.label}>Story Points:</Text>
                         <TextInput
@@ -95,95 +200,37 @@ export default function ModificarProyecto({ navigation }) {
                             placeholder="Story Points"
                             keyboardType="numeric"
                         />
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={AgregarTarea}>
+                        <TouchableOpacity style={styles.button} onPress={AgregarTarea}>
                             <Text style={styles.buttonText}>Agregar Tarea</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <View style={styles.boxTareasGenerales}>
+                    <View style={styles.listaTareasBox}>
                         <Text style={styles.titulo}>Tareas</Text>
-                        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollViewContent} nestedScrollEnabled>
-                            <View style={styles.tareasContainer}>
-                                <View style={styles.boxTarea}>
-                                    <Text style={styles.tareaText}>Tarea 01</Text>
-                                    <View style={styles.botonesContainer}>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Modificar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Finalizar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonEliminar}>
-                                            <Text style={styles.buttonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={styles.boxTarea}>
-                                    <Text style={styles.tareaText}>Tarea 02</Text>
-                                    <View style={styles.botonesContainer}>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Modificar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Finalizar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonEliminar}>
-                                            <Text style={styles.buttonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={styles.boxTarea}>
-                                    <Text style={styles.tareaText}>Tarea 03</Text>
-                                    <View style={styles.botonesContainer}>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Modificar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Finalizar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonEliminar}>
-                                            <Text style={styles.buttonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={styles.boxTarea}>
-                                    <Text style={styles.tareaText}>Tarea 04</Text>
-                                    <View style={styles.botonesContainer}>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Modificar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Finalizar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonEliminar}>
-                                            <Text style={styles.buttonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                </View>
-                                <View style={styles.boxTarea}>
-                                    <Text style={styles.tareaText}>Tarea 05</Text>
-                                    <View style={styles.botonesContainer}>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Modificar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonAcciones}>
-                                            <Text style={styles.buttonText}>Finalizar</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity style={styles.botonEliminar}>
-                                            <Text style={styles.buttonText}>Eliminar</Text>
-                                        </TouchableOpacity>
-                                    </View>
+                        {tareas.map(tarea => (
+                            <View key={tarea.id} style={styles.tarea}>
+                                <Text style={styles.tareaTexto}>Nombre: {tarea.nombre}</Text>
+                                <Text style={styles.tareaTexto}>Descripción: {tarea.descripcion}</Text>
+                                <Text style={styles.tareaTexto}>Story Points: {tarea.storyPoints}</Text>
+                                <Text style={styles.tareaTexto}>Usuario Asignado: {tarea.UsuarioACargo}</Text>
+                                <Text style={styles.tareaTexto}>Estado: {tarea.idEstado}</Text>
+                                <View style={styles.tareaAcciones}>
+                                <TouchableOpacity style={styles.button} onPress={() => finalizarTarea(tarea.idTarea, tarea.nombre)}>
+                                    <Text style={styles.buttonText}>Finalizar</Text>
+                                </TouchableOpacity>
+                                    <TouchableOpacity style={styles.button} onPress={() => eliminarTarea(tarea.idTarea)}>
+                                        <Text style={styles.buttonText}>Eliminar</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
-                        </ScrollView>
+                        ))}
                     </View>
                 </View>
             </View>
         </ScrollView>
     );
 }
+
 
 const styles = StyleSheet.create({
     scrollViewContent: {
