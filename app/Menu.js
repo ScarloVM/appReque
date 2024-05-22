@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, ScrollView } from 'react-native';
+// import { ScrollView } from 'react-native-web';
 
 
 export default function Menu({route, navigation }) {
@@ -39,42 +40,44 @@ export default function Menu({route, navigation }) {
     };
 
     return (
-        <View style={styles.backgroundStyle}>
-            <Text style={styles.namePage}>Snupie</Text>
-            <View style={styles.squareMenu}>
-                <TouchableOpacity style={styles.button} onPress={enviarAAsignarColab}>
-                <Text style={styles.buttonText}>Asignación de colaboradores</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAModColab}>
-                <Text style={styles.buttonText}>Modificar información colaborador</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarACrearProyecto}>
-                <Text style={styles.buttonText}>Creación de Proyectos</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAConsultarProyecto}>
-                <Text style={styles.buttonText}>Consulta de Proyectos</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAModProyecto}>
-                <Text style={styles.buttonText}>Modificar información proyecto</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarACrearReunion}>
-                <Text style={styles.buttonText}>Crear Reunion</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
-                <Text style={styles.buttonText}>Informe General</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
-                <Text style={styles.buttonText}>Informe Tiempo</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
-                <Text style={styles.buttonText}>Informe Gastos</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={enviarAForos}>
-                <Text style={styles.buttonText}>Foros</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
+      <View style={styles.backgroundStyle}>
+          <Text style={styles.namePage}>Snupie</Text>
+          <ScrollView contentContainerStyle={styles.scrollViewContent}>
+              <View style={styles.squareMenu}>
+                  <TouchableOpacity style={styles.button} onPress={enviarAAsignarColab}>
+                      <Text style={styles.buttonText}>Asignación de colaboradores</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAModColab}>
+                      <Text style={styles.buttonText}>Modificar información colaborador</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarACrearProyecto}>
+                      <Text style={styles.buttonText}>Creación de Proyectos</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAConsultarProyecto}>
+                      <Text style={styles.buttonText}>Consulta de Proyectos</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAModProyecto}>
+                      <Text style={styles.buttonText}>Modificar información proyecto</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarACrearReunion}>
+                      <Text style={styles.buttonText}>Crear Reunion</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
+                      <Text style={styles.buttonText}>Informe General</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
+                      <Text style={styles.buttonText}>Informe Tiempo</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
+                      <Text style={styles.buttonText}>Informe Gastos</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.button} onPress={enviarAForos}>
+                      <Text style={styles.buttonText}>Foros</Text>
+                  </TouchableOpacity>
+              </View>
+          </ScrollView>
+      </View>
+  );
 }
 
 const styles = StyleSheet.create({

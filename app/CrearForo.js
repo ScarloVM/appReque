@@ -1,12 +1,66 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 export default function CrearForo({ navigation }) {
-  const [selectedProyecto, setSelectedProyecto] = useState('');
+    const [selectedProyecto, setSelectedProyecto] = useState('');
+    const [temaC, setTema] = useState('');
+    const [descripcionC, setDescripcion] = useState('');
+    const [listaProyectos, setListaProyectos] = useState([])
+
+    useEffect(() => {
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/projects')
+        .then(response => response.json())
+        .then(data => {
+            var jsonData=data[0];
+            console.log(jsonData);
+
+            var ListaProyectos = jsonData.map(item => [item.idProyecto, item.Nombre])
+            console.log(ListaProyectos);
+            setListaProyectos(ListaProyectos || []); // Si no hay colaboradores, se asigna un arreglo vacío
+        })
+      }, []);
+    const cargarProyectos = () => {
+      return listaProyectos.map((proyecto) => {
+          return <Picker.Item label={proyecto[1]} value={proyecto[0]} key={proyecto} />;
+      });
+    };
+
+
 
   const crearForo = () => {
     // Lógica para crear el foro
+
+    var proyecto = parseInt(selectedProyecto)
+    var tema = temaC
+    var descripcion = descripcionC
+
+    if (proyecto === '0') {
+        proyecto = null;
+    }
+
+    var datos = {
+        idProyecto:proyecto,
+        tema:tema,
+        idUsuario:1, //Crear Foro por el momento solo el 1
+        descripcion:descripcion
+    }
+
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/createForum', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        Alert.alert("Se ha creado el foro");
+        console.log(data)
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
   };
   
   return (
@@ -22,17 +76,23 @@ export default function CrearForo({ navigation }) {
             onValueChange={(itemValue) => setSelectedProyecto(itemValue)}
           >
             <Picker.Item label="Público" value="publico" />
+            {cargarProyectos()}
           </Picker>
           <Text style={styles.label}>Tema:</Text>
           <TextInput
             style={styles.input}
             placeholder="Tema"
+            multiline
+            onChangeText={setTema}
+            value={temaC}
           />
           <Text style={styles.label}>Descripción:</Text>
           <TextInput
             style={styles.textArea}
             placeholder="Descripción"
             multiline
+            onChangeText={setDescripcion}
+            value={descripcionC}
           />
           <TouchableOpacity
             style={styles.button}
