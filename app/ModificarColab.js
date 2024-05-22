@@ -1,11 +1,65 @@
-import React from 'react';
+import React, { useEffect, useState} from 'react';
 import { Picker } from '@react-native-picker/picker';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
 
 export default function ModificarColab({ navigation }) {
-    const modificarInfo = () => {
-    // Lógica para modificar la información del colaborador
+    const [correoElectronico, setCorreoElectronico] = useState('');
+    const [departamento, setDepartamento] = useState('');
+    const [numeroTelefono, setNumeroTelefono] = useState('');
+    const [listaColaboradores, setListaColaboradores] = useState([]);
+    const [selectedColab , setSelectedColab] = useState('');
+    const [selectedEstado, setSelectedEstado] = useState('');
+    const [selectedRol, setSelectedRol] = useState('');
+
+    useEffect(() => {
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/users')
+        .then(response => response.json())
+        .then(data => {
+            var jsonData=data;
+            console.log(jsonData);
+
+            var ListaColaboradores = jsonData.map(item => [item.idUsuario, item.nombre])
+            setListaColaboradores(ListaColaboradores || []); // Si no hay colaboradores, se asigna un arreglo vacío
+        })
+      }, []);
+    const cargarColaboradores = () => {
+      return listaColaboradores.map((colaborador) => {
+          return <Picker.Item label={colaborador[1]} value={colaborador[0]} key={colaborador} />;
+      });
     };
+
+    const modificarInfo = () => {
+      
+    // Lógica para modificar la información del colaborador
+      var datos = {
+        "correoElectronico": correoElectronico,
+        "departamento" : departamento,
+        "numeroTelefono": numeroTelefono,
+        "estado": parseInt(selectedEstado),
+        "rol":parseInt(selectedRol) //Cambiar en el appService y Stored Procedure
+    }
+
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/updateUser/' + selectedColab, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        Alert.alert("El colaborador ha sido modificado correctamente");
+        console.log(data);// Aquí puedes hacer algo con la respuesta del servidor si es necesario
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+      console.log(JSON.stringify(datos));
+    };
+
+    
+
+    
 
     return(
     <View style={styles.backgroundStyle}>
@@ -15,37 +69,43 @@ export default function ModificarColab({ navigation }) {
           <Text style={styles.Text}>Seleccione el colaborador:</Text>
           <Picker
             style={styles.selectColab}
-            selectedValue={null}
-            onValueChange={(itemValue, itemIndex) => {
-              // Lógica para seleccionar el colaborador
-            }}
+            selectedValue={selectedColab}
+            onValueChange={(itemValue) => setSelectedColab(itemValue)}
           >
-            {/* Aquí deberías llenar las opciones con los colaboradores disponibles */}
-            <Picker.Item label="Colaborador 1" value="colab1" />
-            <Picker.Item label="Colaborador 2" value="colab2" />
+            {cargarColaboradores()}
           </Picker>
         </View>
         <View style={styles.box2}>
           <Text style={styles.Text}>Nuevos Datos</Text>
-          <TextInput style={styles.input} placeholder="Email" />
-          <TextInput style={styles.input} placeholder="Departamento al que pertenece" />
-          <TextInput style={styles.input} placeholder="Telefono" />
+          <TextInput style={styles.input}
+           placeholder="Email" 
+           multiline
+           onChangeText={setCorreoElectronico}
+           value={correoElectronico}
+           />
+          <TextInput style={styles.input}
+           placeholder="Departamento al que pertenece"
+           multiline
+           onChangeText={setDepartamento}
+           value={departamento} />
+          <TextInput style={styles.input}
+           placeholder="Telefono"
+           multiline
+           onChangeText={setNumeroTelefono}
+           value={numeroTelefono} 
+           />
           <Picker
             style={styles.selectEstado}
-            selectedValue={1} // Valor inicial
-            onValueChange={(itemValue, itemIndex) => {
-              // Lógica para seleccionar el estado
-            }}
+            selectedValue={selectedEstado} // Valor inicial
+            onValueChange={(itemValue) => setSelectedEstado(itemValue)}
           >
             <Picker.Item label="Disponible" value={1} />
             <Picker.Item label="Ocupado" value={2} />
           </Picker>
           <Picker
             style={styles.selectRol}
-            selectedValue={null} // Valor inicial
-            onValueChange={(itemValue, itemIndex) => {
-              // Lógica para seleccionar el rol
-            }}
+            selectedValue={selectedRol} // Valor inicial
+            onValueChange={(itemValue) => setSelectedRol(itemValue)}
           >
             <Picker.Item label="Administrador" value={1} />
             <Picker.Item label="Colaborador" value={2} />
