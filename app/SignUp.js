@@ -2,7 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-export default function SignUp () {
+export default function SignUp ({ navigation }) {
   const [nombre, setNombre] = useState('');
   const [cedula, setCedula] = useState('');
   const [email, setEmail] = useState('');
@@ -20,6 +20,7 @@ export default function SignUp () {
       contrasena:password
     };
 
+    console.log(datos);
     fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/register', {
         method: 'POST',
         headers: {

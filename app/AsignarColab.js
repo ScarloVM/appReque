@@ -6,18 +6,27 @@ export default function AsignarColab({ navigation }) {
     const [selectedProyecto, setSelectedProyecto] = useState('');
     const [selectedColaborador, setSelectedColaborador] = useState('');
     const [selectedEliminar, setSelectedEliminar] = useState('');
+    const [ListaProyectos, setListaProyectos] = useState([]);
+    const [ListaColaboradoresSinProyecto, setListaColaboradoresSinProyecto] = useState([]);
     const [colaboradoresEliminar, setColaboradoresEliminar] = useState([]);
 
-
-    const proyectos = [ 'Proyecto 1', 'Proyecto 2', 'Proyecto 3' ];
-
-    const proyectoColaboradores = { // Colaboradores por proyecto
-    'Proyecto 1': ['Colaborador 1', 'Colaborador 2'],
-    'Proyecto 2': ['Colaborador 2', 'Colaborador 3'],
-    'Proyecto 3': ['Colaborador 1', 'Colaborador 3']
-    };
-
-    const colaboradores = [ 'Colaborador 1', 'Colaborador 2', 'Colaborador 3' ]; // Colaboradores disponibles
+    useEffect(() => {
+      fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/projects')
+      .then(response => response.json())
+      .then (data => {
+        var jsonData= data[0];
+        var ListaProyectos = jsonData.map(item => [item.idProyecto, item.Nombre]);
+        setListaProyectos(ListaProyectos || []); // Si no hay proyectos, se asigna un arreglo vacío
+      });
+      
+      fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/usersNotAsigned')
+      .then(response => response.json())
+      .then(data => {
+        var jsonData=data[0];
+        var ListaColaboradoresSinProyecto = jsonData.map(item => [item.idUsuario, item.nombre])
+        setListaColaboradoresSinProyecto(ListaColaboradoresSinProyecto || []); // Si no hay colaboradores, se asigna un arreglo vacío
+      });
+    }, []);
 
     const asignarColaborador = () => {
       var datos = {
@@ -25,27 +34,63 @@ export default function AsignarColab({ navigation }) {
         idUsuario: selectedColaborador
       };
 
-      Alert.alert('Colaborador Asignado', `Proyecto: ${datos.idProyecto} \nColaborador: ${datos.idUsuario}`);
+      fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/asignProject', {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(datos)
+      })
+      .then(response => response.json())
+      .then(data => {
+          Alert.alert("El colaborador ha sido asignado correctamente", `Proyecto: ${datos.idProyecto} \nColaborador: ${datos.idUsuario}`);
+          console.log(data);// Aquí puedes hacer algo con la respuesta del servidor si es necesario
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
     };
 
-    const eliminarColaborador = () => {
+    const eliminarColaborador = () => { //Arreglar eliminar colaborador
+      console.log(selectedEliminar);
+      console.log(selectedProyecto);
       var datos = {
         idUsuario: selectedEliminar,
         idProyecto: selectedProyecto
       }
 
-      Alert.alert('Colaborador Eliminado', `Colaborador: ${datos.idUsuario} \nProyecto: ${datos.idProyecto}`)
+      // fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/deleteUserProject/', {
+      //   method: 'DELETE',
+      //   headers: {
+      //       'Content-Type': 'application/json'
+      //   },
+      //   body: JSON.stringify(datos)
+          
+      // })
+      // .then(response => {
+      //   if (response.ok) {
+      //     // La solicitud de eliminación fue exitosa
+      //     Alert.alert('El colaborador fue eliminado correctamente.');
+      //   } else {
+      //       // La solicitud de eliminación falló
+      //       console.error('Error al intentar eliminar al colaborador.');
+      //   }
+      // })
+      // .catch(error => {
+      //   // Manejar errores de red u otros errores
+      //   console.error('Hubo un error en la solicitud de eliminación:', error);
+      // });
     };
 
     const cargarProyectos = () => {
-      return proyectos.map((proyecto) => {
-          return <Picker.Item label={proyecto} value={proyecto} key={proyecto} />;
+      return ListaProyectos.map((proyecto) => {
+          return <Picker.Item label={proyecto[1]} value={proyecto[0]} key={proyecto} />;
       });
     };
 
     const cargarColaboradores = () => {
-      return colaboradores.map((colaborador) => {
-          return <Picker.Item label={colaborador} value={colaborador} key={colaborador} />;
+      return ListaColaboradoresSinProyecto.map((colaborador) => {
+          return <Picker.Item label={colaborador[1]} value={colaborador[0]} key={colaborador} />;
       });
     };
 
@@ -53,18 +98,23 @@ export default function AsignarColab({ navigation }) {
     // Actualizar colaboradores a eliminar al cambiar de proyecto
     useEffect(() => {
       if (selectedProyecto) {
-        setColaboradoresEliminar(proyectoColaboradores[selectedProyecto] || []); // Si no hay colaboradores, se asigna un arreglo vacío
-        setSelectedEliminar('');
+        fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/projectWorkers/'+parseInt(selectedProyecto))
+        .then(response => response.json())
+        .then (data => {
+          var jsonData = data[0];
+          var usuarios = jsonData.map(item => [item.idUsuario, item.nombre])
+          console.log(usuarios);
+          setColaboradoresEliminar(usuarios || []); // Si no hay colaboradores, se asigna un arreglo vacío
+          setSelectedEliminar('');
+        })
       }
     }, [selectedProyecto]);
 
     const cargarEliminarColab = () => {
       return colaboradoresEliminar.map((colaborador) => {
-          return <Picker.Item label={colaborador} value={colaborador} key={colaborador} />;
+        return <Picker.Item label={colaborador[1]} value={colaborador[0]} key={colaborador} />;
       });
     };
-
-
 
     return (
         <View style={styles.backgroundStyle}>

@@ -29,7 +29,7 @@ export default function Login({ navigation }) {
     //         var idUsuarioSistema = data['@idUsuarioR'];
     //         navigation.navigate('Menu', { idUsuarioSistema: idUsuarioSistema });
     //         Alert.alert("Inicio de sesión válido")
-            
+       
     //     } else {
     //         Alert.alert("Su Email o Password son incorrectos")
     //     }        
