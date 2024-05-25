@@ -32,7 +32,15 @@ export default function Menu({route, navigation }) {
     };
 
     const enviarAInformeGeneral = () => {
-    // Lógica para enviar a la página de informe general
+        navigation.navigate('InformeGeneral');
+    };
+
+    const enviarAInformeTiempo = () => {
+        navigation.navigate('InformeTiempo');
+    };
+
+    const enviarAInformeGastos = () => {
+        navigation.navigate('InformeGastos');
     };
 
     const enviarAForos = () => {
@@ -65,10 +73,10 @@ export default function Menu({route, navigation }) {
                   <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
                       <Text style={styles.buttonText}>Informe General</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
+                  <TouchableOpacity style={styles.button} onPress={enviarAInformeTiempo}>
                       <Text style={styles.buttonText}>Informe Tiempo</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGeneral}>
+                  <TouchableOpacity style={styles.button} onPress={enviarAInformeGastos}>
                       <Text style={styles.buttonText}>Informe Gastos</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.button} onPress={enviarAForos}>

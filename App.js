@@ -12,6 +12,9 @@ import ModProyecto from './app/ModificarProyecto.js'; //Pantalla de ModProyecto
 import CrearForo from './app/CrearForo.js'; //Pantalla de CrearForo
 import ConsultarProyecto from './app/ConsultarProyecto.js'; //Pantalla de ConsultarProyecto
 import TableroSeguimiento from './app/TableroSeguimiento.js'; //Pantalla de TableroSeguimiento
+import InformeGeneral from './app/InformeGeneral.js'; //Pantalla de InformeGeneral
+import InformeTiempo from './app/InformeTiempo.js'; //Pantalla de InformeTiempo
+import InformeGastos from './app/InformeGastos.js'; //Pantalla de InformeGastos
 
 const Stack = createNativeStackNavigator();
 
@@ -29,6 +32,9 @@ export default function App() {
         <Stack.Screen name="CrearForo" component={CrearForo}/>
         <Stack.Screen name="ConsultarProyecto" component={ConsultarProyecto}/>
         <Stack.Screen name="TableroSeguimiento" component={TableroSeguimiento}/>
+        <Stack.Screen name="InformeGeneral" component={InformeGeneral}/>
+        <Stack.Screen name="InformeTiempo" component={InformeTiempo}/>
+        <Stack.Screen name="InformeGastos" component={InformeGastos}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
