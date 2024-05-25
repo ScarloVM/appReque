@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ConsultaProyecto = () => {
+
+const ConsultaProyecto = ({navigation}) => {
   const [nombreProyecto, setNombreProyecto] = useState('Proyecto de Prueba');
   const [proyectos, setProyectos] = useState([]);
   const [tareasPorHacer, setTareasPorHacer] = useState([]);
@@ -46,6 +47,13 @@ const ConsultaProyecto = () => {
     <ScrollView>
       <View style={styles.backgroundStyle}>
         <Text style={styles.namePage}>Snupie</Text>
+        <TouchableOpacity
+            style = {styles.botonTableroSeguimiento}  
+            onPress={() => navigation.navigate('TableroSeguimiento')}
+            >
+            <Text style = {styles.title}>Tablero de seguimiento</Text>
+
+        </TouchableOpacity>
         <View style={styles.divIzquierdo}>
           <Text style={styles.title}>Proyectos en Curso</Text>
           <ScrollView style={styles.divBotones} nestedScrollEnabled>
@@ -193,6 +201,15 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     borderRadius: 5,
   },
+  botonTableroSeguimiento: {
+    backgroundColor: '#1E3731',
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+
 });
 
 export default ConsultaProyecto;
