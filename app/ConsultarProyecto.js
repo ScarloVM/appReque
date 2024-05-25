@@ -1,42 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 
-const ConsultaProyecto = ({ navigation }) => {
+const ConsultaProyecto = () => {
   const [nombreProyecto, setNombreProyecto] = useState('Proyecto de Prueba');
   const [proyectos, setProyectos] = useState([]);
   const [tareasPorHacer, setTareasPorHacer] = useState([]);
   const [tareasEnProgreso, setTareasEnProgreso] = useState([]);
   const [tareasFinalizadas, setTareasFinalizadas] = useState([]);
+  const [proyectoSeleccionado, setProyectoSeleccionado] = useState(null);
 
   useEffect(() => {
-    // Datos de prueba para los proyectos
-    setProyectos(['Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 465' ]);
-    
-    // Datos de prueba para las tareas
-    setTareasPorHacer(['Tarea 1', 'Tarea 2', 'Tarea 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 3', 'Proyecto 1', 'Proyecto 2', 'Proyecto 465']);
-    setTareasEnProgreso(['Tarea 4', 'Tarea 5']);
-    setTareasFinalizadas(['Tarea 6']);
+    // Aquí puedes cargar los datos de los proyectos desde una API o algún otro origen de datos
+    fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/projects')
+      .then(response => response.json())
+      .then(data => {
+        setProyectos(data[0].map(item => [item.idProyecto, item.Nombre]));
+      })
+      .catch(error => console.error(error));
   }, []);
 
-  const seleccionarProyecto = (nombre) => {
-    setNombreProyecto(nombre);
-    // Aquí podrías cargar las tareas específicas para el proyecto seleccionado
+  const cargarTareas = (proyecto) => {
+    fetch(`https://api-snupie-saap7xdoua-uc.a.run.app/api/projectTasks/${proyecto[0]}`)
+      .then(response => response.json())
+      .then(data => {
+        const tareas = data[0];
+        setNombreProyecto(proyecto[1]);
+
+        const tareasPorHacer = tareas.filter(tarea => tarea.estado === 'Pendiente');
+        const tareasEnProgreso = tareas.filter(tarea => tarea.estado === 'En proceso');
+        const tareasFinalizadas = tareas.filter(tarea => tarea.estado === 'Completada');
+
+        setTareasPorHacer(tareasPorHacer);
+        setTareasEnProgreso(tareasEnProgreso);
+        setTareasFinalizadas(tareasFinalizadas);
+      })
+      .catch(error => console.error(error));
+  };
+
+  const seleccionarProyecto = (proyecto) => {
+    setProyectoSeleccionado(proyecto);
+    cargarTareas(proyecto);
   };
 
   return (
-    <ScrollView >
+    <ScrollView>
       <View style={styles.backgroundStyle}>
         <Text style={styles.namePage}>Snupie</Text>
         <View style={styles.divIzquierdo}>
           <Text style={styles.title}>Proyectos en Curso</Text>
           <ScrollView style={styles.divBotones} nestedScrollEnabled>
             {proyectos.map((proyecto, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.proyectoButton} 
+              <TouchableOpacity
+                key={index}
+                style={[styles.proyectoButton, proyectoSeleccionado === proyecto ? styles.proyectoButtonSelected : null]}
                 onPress={() => seleccionarProyecto(proyecto)}
               >
-                <Text style={styles.proyectoButtonText}>{proyecto}</Text>
+                <Text style={styles.proyectoButtonText}>{proyecto[1]}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
@@ -47,7 +66,8 @@ const ConsultaProyecto = ({ navigation }) => {
           <View style={styles.tareasContainer}>
             {tareasPorHacer.map((tarea, index) => (
               <View key={index} style={styles.tarea}>
-                <Text>{tarea}</Text>
+                <Text>{tarea.nombre}</Text>
+                <Text>Asignada a: {tarea.responsable}</Text>
               </View>
             ))}
           </View>
@@ -55,7 +75,8 @@ const ConsultaProyecto = ({ navigation }) => {
           <View style={styles.tareasContainer}>
             {tareasEnProgreso.map((tarea, index) => (
               <View key={index} style={styles.tarea}>
-                <Text>{tarea}</Text>
+                <Text>{tarea.nombre}</Text>
+                <Text>Asignada a: {tarea.responsable}</Text>
               </View>
             ))}
           </View>
@@ -63,7 +84,8 @@ const ConsultaProyecto = ({ navigation }) => {
           <View style={styles.tareasContainer}>
             {tareasFinalizadas.map((tarea, index) => (
               <View key={index} style={styles.tarea}>
-                <Text>{tarea}</Text>
+                <Text>{tarea.nombre}</Text>
+                <Text>Asignada a: {tarea.responsable}</Text>
               </View>
             ))}
           </View>
@@ -120,6 +142,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 10,
     alignItems: 'center',
+  },
+  proyectoButtonSelected: {
+    backgroundColor: '#1E6E5F',
   },
   proyectoButtonText: {
     color: '#FFFFFF',
