@@ -60,7 +60,9 @@ export default function ModificarProyecto({ navigation }) {
             nombre: nombreTarea,
             descripcion: descripcionTarea,
             usuario: selectedColab,
-            storyPoints: storyPointsTarea
+            storyPoints: storyPointsTarea,
+            recursosEconomicos: parseInt(recursosEconomicosTarea),
+            TiempoDesarrollo: parseInt(tiempoEstimadoTarea)
         };
         console.log(datos);
 
