@@ -20,7 +20,7 @@ export default function Menu({route, navigation }) {
     };
 
     const enviarAConsultarProyecto = () => {
-    // Lógica para enviar a la página de consulta de proyectos
+        navigation.navigate('ConsultarProyecto');
     };
 
     const enviarAModProyecto = () => {
