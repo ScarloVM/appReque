@@ -59,7 +59,7 @@ export default function AsignarColab({ navigation }) {
         idUsuario: selectedEliminar,
         idProyecto: selectedProyecto
       }
-
+      console.log(datos)
       fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/deleteUserProject', {
         method: 'DELETE',
         headers: {

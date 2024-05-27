@@ -61,10 +61,9 @@ export default function ModificarProyecto({ navigation }) {
             descripcion: descripcionTarea,
             usuario: selectedColab,
             storyPoints: storyPointsTarea,
-            recursosEconomicos: parseInt(recursosEconomicosTarea),
+            RecursosEconomicos: parseInt(recursosEconomicosTarea),
             TiempoDesarrollo: parseInt(tiempoEstimadoTarea)
         };
-        console.log(datos);
 
         fetch('https://api-snupie-saap7xdoua-uc.a.run.app/api/createTask', {
             method: 'POST',
@@ -75,6 +74,7 @@ export default function ModificarProyecto({ navigation }) {
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data);
                 cargarTareas(selectedProyecto);
             })
             .catch(error => {
